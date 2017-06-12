@@ -13,11 +13,11 @@ defmodule Microblog.Router do
     plug :accepts, ["json"]
   end
 
-  # scope "/", Microblog do
-  #   pipe_through :browser # Use the default browser stack
+  scope "/", Microblog do
+    pipe_through :browser # Use the default browser stack
 
-  #   get "/", PageController, :index
-  # end
+    get "/", PageController, :index
+  end
 
   # Other scopes may use custom stacks.
   scope "/api", Microblog do
