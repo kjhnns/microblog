@@ -3,77 +3,123 @@
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onClick)
+
+--import Http
+--import Json.Decode as Decode
 
 
+main : Program Never Model Msg
 main =
   Html.beginnerProgram
-    { model = model
+    { model = emptyModel
     , view = view
     , update = update
     }
 
 
-
 -- MODEL
 
-
 type alias Model =
-  { name : String
-  , password : String
-  , passwordAgain : String
+  { status : String
+  , content : String
+  , posts: List Post
   }
 
-
-model : Model
-model =
-  Model "" "" ""
-
-
-
--- UPDATE
-
+type alias Post =
+  {   content : String
+  ,   time : String
+  }
 
 type Msg
-    = Name String
-    | Password String
-    | PasswordAgain String
+  = Text String
+  | Delete Post
+  | Save
+
+
+emptyModel : Model
+emptyModel = {
+  status = "",
+  content = "",
+  posts = [] }
+
+
+updateContent : String -> Model -> Model
+updateContent txt model =
+  Model
+    model.status
+    txt
+    model.posts
+
+updateStatus : String -> Model -> Model
+updateStatus txt model =
+  Model
+    txt
+    model.content
+    model.posts
+
+addPost : Model -> Model
+addPost model =
+  Model
+    model.status
+    ""
+    ((Post model.content "today") :: model.posts)
+
+removePost : Post -> Model -> Model
+removePost ps model =
+  updateStatus "removed" { model |
+    posts = (List.filter (\p -> p /= ps) model.posts)
+  }
+
 
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Name name ->
-      { model | name = name }
+    Delete p ->
+      removePost p model
 
-    Password password ->
-      { model | password = password }
+    Text content ->
+      updateContent
+        content
+        (updateStatus "typing" model)
 
-    PasswordAgain password ->
-      { model | passwordAgain = password }
+    Save ->
+      addPost
+        (updateStatus "saving" model)
+
+
+renderList : List Post -> Html Msg
+renderList lst =
+      List.map (\l ->
+                Html.li []
+                [ div [] [ text  l.content ]
+                , div [] [text l.time]
+                , a [ onClick (Delete l) ][ text "delete "]
+                ])
+        lst
+      |> Html.ul [ style [ ("background", "yellow") ] ]
 
 
 
 -- VIEW
-
-
 view : Model -> Html Msg
 view model =
   div []
-    [ input [ type_ "text", placeholder "Name", onInput Name ] []
-    , input [ type_ "password", placeholder "Password", onInput Password ] []
-    , input [ type_ "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
-    , viewValidation model
+    [ textarea [ value model.content, onInput Text, class "postText" ] [ ]
+    , input [ value model.status, class "postState" ] []
+    , button [ onClick Save, class "postButton" ] [ text "Save" ]
+    , renderList model.posts
     ]
 
 
-viewValidation : Model -> Html msg
-viewValidation model =
-  let
-    (color, message) =
-      if model.password == model.passwordAgain then
-        ("green", "OK")
-      else
-        ("red", "Passwords do not match!")
-  in
-    div [ style [("color", color)] ] [ text message ]
+
+
+
+-- HTTP
+
+
+--postPost : Post -> Http.Request (List String)
+--postPost post =
+--  Http.post "/api/posts" Http.emptyBody (list string)
+

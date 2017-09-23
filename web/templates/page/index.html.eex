@@ -1,8 +1,7 @@
 <!-- web/templates/page/index.html.eex -->
 
-
-<div class="col-lg-4">
-  <div id="elm-app"> </div>
+<div class="col-md-12">
+<div id="elm-app"></div>
 </div>
 
 <script type="text/javascript">

@@ -1,56 +1,134 @@
-var _user$project$Main$viewValidation = function (model) {
-	var _p0 = _elm_lang$core$Native_Utils.eq(model.password, model.passwordAgain) ? {ctor: '_Tuple2', _0: 'green', _1: 'OK'} : {ctor: '_Tuple2', _0: 'red', _1: 'Passwords do not match!'};
-	var color = _p0._0;
-	var message = _p0._1;
+var _user$project$Main$emptyModel = {
+	status: '',
+	content: '',
+	posts: {ctor: '[]'}
+};
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {status: a, content: b, posts: c};
+	});
+var _user$project$Main$updateContent = F2(
+	function (txt, model) {
+		return A3(_user$project$Main$Model, model.status, txt, model.posts);
+	});
+var _user$project$Main$updateStatus = F2(
+	function (txt, model) {
+		return A3(_user$project$Main$Model, txt, model.content, model.posts);
+	});
+var _user$project$Main$removePost = F2(
+	function (ps, model) {
+		return A2(
+			_user$project$Main$updateStatus,
+			'removed',
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{
+					posts: A2(
+						_elm_lang$core$List$filter,
+						function (p) {
+							return !_elm_lang$core$Native_Utils.eq(p, ps);
+						},
+						model.posts)
+				}));
+	});
+var _user$project$Main$Post = F2(
+	function (a, b) {
+		return {content: a, time: b};
+	});
+var _user$project$Main$addPost = function (model) {
+	return A3(
+		_user$project$Main$Model,
+		model.status,
+		'',
+		{
+			ctor: '::',
+			_0: A2(_user$project$Main$Post, model.content, 'today'),
+			_1: model.posts
+		});
+};
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'Delete':
+				return A2(_user$project$Main$removePost, _p0._0, model);
+			case 'Text':
+				return A2(
+					_user$project$Main$updateContent,
+					_p0._0,
+					A2(_user$project$Main$updateStatus, 'typing', model));
+			default:
+				return _user$project$Main$addPost(
+					A2(_user$project$Main$updateStatus, 'saving', model));
+		}
+	});
+var _user$project$Main$Save = {ctor: 'Save'};
+var _user$project$Main$Delete = function (a) {
+	return {ctor: 'Delete', _0: a};
+};
+var _user$project$Main$renderList = function (lst) {
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$ul,
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$style(
 				{
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'color', _1: color},
+					_0: {ctor: '_Tuple2', _0: 'background', _1: 'yellow'},
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
 		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(message),
-			_1: {ctor: '[]'}
-		});
+		A2(
+			_elm_lang$core$List$map,
+			function (l) {
+				return A2(
+					_elm_lang$html$Html$li,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(l.content),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(l.time),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_user$project$Main$Delete(l)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('delete '),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					});
+			},
+			lst));
 };
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
-			case 'Name':
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{name: _p1._0});
-			case 'Password':
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{password: _p1._0});
-			default:
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{passwordAgain: _p1._0});
-		}
-	});
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {name: a, password: b, passwordAgain: c};
-	});
-var _user$project$Main$model = A3(_user$project$Main$Model, '', '', '');
-var _user$project$Main$PasswordAgain = function (a) {
-	return {ctor: 'PasswordAgain', _0: a};
-};
-var _user$project$Main$Password = function (a) {
-	return {ctor: 'Password', _0: a};
-};
-var _user$project$Main$Name = function (a) {
-	return {ctor: 'Name', _0: a};
+var _user$project$Main$Text = function (a) {
+	return {ctor: 'Text', _0: a};
 };
 var _user$project$Main$view = function (model) {
 	return A2(
@@ -59,16 +137,16 @@ var _user$project$Main$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$textarea,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('text'),
+					_0: _elm_lang$html$Html_Attributes$value(model.content),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$placeholder('Name'),
+						_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Text),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Name),
+							_0: _elm_lang$html$Html_Attributes$class('postText'),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -80,39 +158,35 @@ var _user$project$Main$view = function (model) {
 					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('password'),
+						_0: _elm_lang$html$Html_Attributes$value(model.status),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$placeholder('Password'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Password),
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Attributes$class('postState'),
+							_1: {ctor: '[]'}
 						}
 					},
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$input,
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$type_('password'),
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('Re-enter Password'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$PasswordAgain),
-									_1: {ctor: '[]'}
-								}
+								_0: _elm_lang$html$Html_Attributes$class('postButton'),
+								_1: {ctor: '[]'}
 							}
 						},
-						{ctor: '[]'}),
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Save'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Main$viewValidation(model),
+						_0: _user$project$Main$renderList(model.posts),
 						_1: {ctor: '[]'}
 					}
 				}
@@ -120,4 +194,4 @@ var _user$project$Main$view = function (model) {
 		});
 };
 var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
-	{model: _user$project$Main$model, view: _user$project$Main$view, update: _user$project$Main$update})();
+	{model: _user$project$Main$emptyModel, view: _user$project$Main$view, update: _user$project$Main$update})();

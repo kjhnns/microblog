@@ -24,6 +24,7 @@ defmodule Microblog.Router do
     pipe_through :api
 
     get "/posts", PostController, :index
+    post "/posts", PostController, :create
 
   end
 end
