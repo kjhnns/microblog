@@ -1474,6 +1474,22 @@ require.register("elm/src/Main.elm", function(exports, require, module) {
 
 });
 
+;require.register("elm/src/Model.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/src/Routing.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/src/Views/Post.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/src/Views/Read.elm", function(exports, require, module) {
+
+});
+
 ;require.register("web/static/js/app.js", function(exports, require, module) {
 "use strict";
 
@@ -1553,8 +1569,8 @@ channel.join().receive("ok", function (resp) {
 exports.default = socket;
 });
 
-;require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");require.register("___globals___", function(exports, require, module) {
+;require.alias("phoenix/priv/static/phoenix.js", "phoenix");
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
