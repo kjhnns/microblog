@@ -5,17 +5,35 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
 
---import Http
---import Json.Decode as Decode
+
+import RemoteData exposing (WebData)
+
+
+import Http
+import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (decode, optional)
+
+
 
 
 main : Program Never Model Msg
 main =
-  Html.beginnerProgram
-    { model = emptyModel
-    , view = view
-    , update = update
-    }
+    program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( emptyModel, fetchData )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
 
 
 -- MODEL
@@ -23,83 +41,130 @@ main =
 type alias Model =
   { status : String
   , content : String
-  , posts: List Post
+  , posts: WebData (List Post)
   }
 
 type alias Post =
-  {   content : String
-  ,   time : String
+  {   text : String
+  ,   updated_at : String
   }
 
 type Msg
   = Text String
   | Delete Post
   | Save
+  | OnFetchData (WebData (List Post))
 
 
 emptyModel : Model
 emptyModel = {
   status = "",
   content = "",
-  posts = [] }
+  posts = RemoteData.Loading }
 
 
 updateContent : String -> Model -> Model
 updateContent txt model =
-  Model
-    model.status
-    txt
-    model.posts
+  { model | content = txt }
 
 updateStatus : String -> Model -> Model
 updateStatus txt model =
-  Model
-    txt
-    model.content
-    model.posts
+  { model | status = txt }
 
 addPost : Model -> Model
 addPost model =
-  Model
-    model.status
-    ""
-    ((Post model.content "today") :: model.posts)
+  { model | content = "", posts =  (RemoteData.Success ((Post model.content "today") :: (maybeList model.posts))) }
+
 
 removePost : Post -> Model -> Model
 removePost ps model =
   updateStatus "removed" { model |
-    posts = (List.filter (\p -> p /= ps) model.posts)
+    posts = (RemoteData.Success (List.filter (\p -> p /= ps) (maybeList model.posts)))
   }
 
 
+fetchData : Cmd Msg
+fetchData =
+    Http.get fetchPostUrl postsDecoder
+        |> RemoteData.sendRequest
+        |> Cmd.map OnFetchData
 
-update : Msg -> Model -> Model
+
+
+fetchPostUrl : String
+fetchPostUrl =
+    "http://localhost:4000/api/posts"
+
+
+postsDecoder : Decode.Decoder (List Post)
+postsDecoder =
+    Decode.list postDecoder
+
+
+postDecoder : Decode.Decoder Post
+postDecoder =
+    decode Post
+        |> Json.Decode.Pipeline.optional "text" Decode.string ""
+        |> Json.Decode.Pipeline.optional "updated_at" Decode.string ""
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
+    OnFetchData data ->
+      ({ model | status ="got data", posts = data }, Cmd.none)
+
     Delete p ->
-      removePost p model
+      (removePost p model, Cmd.none)
 
     Text content ->
-      updateContent
+      (updateContent
         content
         (updateStatus "typing" model)
+        , Cmd.none)
 
     Save ->
-      addPost
+      (addPost
         (updateStatus "saving" model)
+        , Cmd.none)
 
 
-renderList : List Post -> Html Msg
+renderList : WebData (List Post) -> Html Msg
 renderList lst =
       List.map (\l ->
                 Html.li []
-                [ div [] [ text  l.content ]
-                , div [] [text l.time]
+                [ div [] [ text  l.text ]
+                , div [] [text l.updated_at]
                 , a [ onClick (Delete l) ][ text "delete "]
                 ])
-        lst
+        (maybeList lst)
       |> Html.ul [ style [ ("background", "yellow") ] ]
 
+errorMessage : Http.Error -> String
+errorMessage error =
+  case error of
+    Http.Timeout ->
+      "Timeout"
+    Http.NetworkError  ->
+      "Network Error"
+    Http.BadUrl status ->
+      ("BadUrl" ++ status)
+    Http.BadPayload a b ->
+      ("Http.BadPayload"++a)
+    Http.BadStatus status ->
+      ("Http.BadStatus" )
+
+maybeList : WebData (List Post) -> List Post
+maybeList response =
+    case response of
+        RemoteData.Success posts ->
+            posts
+        RemoteData.Loading ->
+          [Post "loading" "now"]
+        RemoteData.NotAsked ->
+          [Post "NotAsked" "now"]
+        RemoteData.Failure err ->
+          [Post ("Sth Went Wrong" ++ (errorMessage err)) "now"]
 
 
 -- VIEW
