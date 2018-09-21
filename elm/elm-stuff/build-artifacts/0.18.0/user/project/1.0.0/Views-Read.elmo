@@ -1,0 +1,170 @@
+var _user$project$Views_Read$errorMessage = function (error) {
+	var _p0 = error;
+	switch (_p0.ctor) {
+		case 'Timeout':
+			return 'Timeout';
+		case 'NetworkError':
+			return 'Network Error';
+		case 'BadUrl':
+			return A2(_elm_lang$core$Basics_ops['++'], 'BadUrl', _p0._0);
+		case 'BadPayload':
+			return A2(_elm_lang$core$Basics_ops['++'], 'Http.BadPayload', _p0._0);
+		default:
+			return 'Http.BadStatus';
+	}
+};
+var _user$project$Views_Read$maybeList = function (response) {
+	var _p1 = response;
+	switch (_p1.ctor) {
+		case 'Success':
+			return _p1._0;
+		case 'Loading':
+			return {
+				ctor: '::',
+				_0: A2(_user$project$Model$Post, 'loading', 'now'),
+				_1: {ctor: '[]'}
+			};
+		case 'NotAsked':
+			return {
+				ctor: '::',
+				_0: A2(_user$project$Model$Post, 'NotAsked', 'now'),
+				_1: {ctor: '[]'}
+			};
+		default:
+			return {
+				ctor: '::',
+				_0: A2(
+					_user$project$Model$Post,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Sth Went Wrong',
+						_user$project$Views_Read$errorMessage(_p1._0)),
+					'now'),
+				_1: {ctor: '[]'}
+			};
+	}
+};
+var _user$project$Views_Read$renderList = function (lst) {
+	return A2(
+		_elm_lang$html$Html$ul,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'background', _1: 'yellow'},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		A2(
+			_elm_lang$core$List$map,
+			function (l) {
+				return A2(
+					_elm_lang$html$Html$li,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(l.text),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(l.timeStp),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_user$project$Model$Delete(l)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('delete '),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					});
+			},
+			_user$project$Views_Read$maybeList(lst)));
+};
+var _user$project$Views_Read$readView = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$textarea,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$value(model.content),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onInput(_user$project$Model$Text),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('postText'),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(model.status),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('postState'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Model$Save),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('postButton'),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Save'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _user$project$Views_Read$renderList(model.posts),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};

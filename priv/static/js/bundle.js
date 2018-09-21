@@ -10218,8 +10218,57 @@ var _user$project$Views_Post$postView = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('Hallo Welt'),
-			_1: {ctor: '[]'}
+			_0: A2(
+				_elm_lang$html$Html$textarea,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$value(model.content),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onInput(_user$project$Model$Text),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('postText'),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(model.status),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('postState'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Model$Save),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('postButton'),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Save'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
 		});
 };
 
@@ -10394,7 +10443,7 @@ var _user$project$Views_Read$readView = function (model) {
 		});
 };
 
-var _user$project$Main$notFoundView = A2(
+var _user$project$View$notFoundView = A2(
 	_elm_lang$html$Html$div,
 	{ctor: '[]'},
 	{
@@ -10402,7 +10451,7 @@ var _user$project$Main$notFoundView = A2(
 		_0: _elm_lang$html$Html$text('Not found'),
 		_1: {ctor: '[]'}
 	});
-var _user$project$Main$page = function (model) {
+var _user$project$View$page = function (model) {
 	var _p0 = model.route;
 	switch (_p0.ctor) {
 		case 'ReadRoute':
@@ -10410,19 +10459,20 @@ var _user$project$Main$page = function (model) {
 		case 'PostRoute':
 			return _user$project$Views_Post$postView(model);
 		default:
-			return _user$project$Main$notFoundView;
+			return _user$project$View$notFoundView;
 	}
 };
-var _user$project$Main$view = function (model) {
+var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _user$project$Main$page(model),
+			_0: _user$project$View$page(model),
 			_1: {ctor: '[]'}
 		});
 };
+
 var _user$project$Main$postDecoder = A4(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
 	'updated_at',
@@ -10485,20 +10535,20 @@ var _user$project$Main$updateContent = F2(
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
 			case 'OnFetchData':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{status: 'got data', posts: _p1._0}),
+						{status: 'got data', posts: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Delete':
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_user$project$Main$removePost, _p1._0, model),
+					_0: A2(_user$project$Main$removePost, _p0._0, model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Text':
@@ -10506,7 +10556,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: A2(
 						_user$project$Main$updateContent,
-						_p1._0,
+						_p0._0,
 						A2(_user$project$Main$updateStatus, 'typing', model)),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -10518,7 +10568,7 @@ var _user$project$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				var newRoute = _user$project$Routing$parseLocation(_p1._0);
+				var newRoute = _user$project$Routing$parseLocation(_p0._0);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -10545,7 +10595,7 @@ var _user$project$Main$init = function (location) {
 var _user$project$Main$main = A2(
 	_elm_lang$navigation$Navigation$program,
 	_user$project$Model$OnLocationChange,
-	{init: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
+	{init: _user$project$Main$init, view: _user$project$View$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
